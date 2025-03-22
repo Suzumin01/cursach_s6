@@ -18,10 +18,13 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.eva.screens.BranchesListScreen
 import com.example.eva.screens.CalendarScreen
+import com.example.eva.screens.FindDoctorsScreen
 import com.example.eva.screens.HomeScreen
 import com.example.eva.screens.MessageScreen
 import com.example.eva.screens.ProfileScreen
+import com.example.eva.screens.SpecializationsListScreen
 import com.example.eva.ui.theme.EvaTheme
 
 class MainActivity : ComponentActivity() {
@@ -141,10 +144,13 @@ fun MainScreen() {
             startDestination = EvaScreens.Home.route,
             modifier = Modifier.padding(innerPadding)
         ) {
-            composable(EvaScreens.Home.route) { HomeScreen() }
+            composable(EvaScreens.Home.route) { HomeScreen(navController) }
             composable(EvaScreens.Message.route) { MessageScreen() }
             composable(EvaScreens.Calendar.route) { CalendarScreen() }
             composable(EvaScreens.Profile.route) { ProfileScreen() }
+            composable(EvaScreens.FindDoctors.route) { FindDoctorsScreen(navController) }
+            composable(EvaScreens.SpecializationsList.route) { SpecializationsListScreen(navController) }
+            composable(EvaScreens.BranchesList.route) { BranchesListScreen(navController) }
         }
     }
 }

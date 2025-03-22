@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">Eva</string>
+    <string name="specializations">Специализация</string>
+    <string name="specialists">Специалисты</string>
+    <string name="branches">Филиалы</string>
+    <string name="more">Ещё</string>
 </resources>
