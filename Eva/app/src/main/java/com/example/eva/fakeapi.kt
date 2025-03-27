@@ -1,5 +1,7 @@
 package com.example.eva
 
+data class Specialist(val id: Int, val name: String)
+
 object fakeapi {
     val specializations = listOf(
         "Акушер-гинеколог",
@@ -18,12 +20,12 @@ object fakeapi {
     )
 
     val specialists = listOf(
-        "Абдрафиков Тагир Надирович",
-        "Абрамова Наталья Николаевна",
-        "Авдеева Сергеев",
-        "Смольников Никита Сергеевич",
-        "Малаев Илья Александрович",
-        "Шкляр Петр Львович",
-        "Смирнов Никита Артемович"
+        Specialist(1, "Абдрафиков Тагир Надирович"),
+        Specialist(2, "Абрамова Наталья Николаевна"),
+        Specialist(3, "Авдеева Сергеев"),
+        Specialist(3, "Смольников Никита Сергеевич"),
+        Specialist(4, "Малаев Илья Александрович"),
+        Specialist(5, "Шкляр Петр Львович"),
+        Specialist(6, "Смирнов Никита Артемович")
     )
 }

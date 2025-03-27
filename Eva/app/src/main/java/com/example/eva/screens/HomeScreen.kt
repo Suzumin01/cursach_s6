@@ -7,6 +7,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -14,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -71,8 +73,11 @@ private fun SpecialistsSection(navController: NavHostController) {
             contentPadding = PaddingValues(horizontal = dimensionResource(R.dimen.padding_medium)),
             horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_medium))
         ) {
-            items(fakeapi.specialists.take(3)) { specialist ->
-                SpecialistCard(name = specialist)
+            items(
+                items = fakeapi.specialists.take(3),
+                key = { it.id } // Добавляем ключ для стабильной идентификации
+            ) { specialist ->
+                SpecialistCard(name = specialist.name) // Передаем имя специалиста
             }
         }
     }
@@ -132,61 +137,80 @@ private fun SectionWithHeader(
 
 @Composable
 fun SpecialistCard(name: String) {
-    Card(
+    Column(
         modifier = Modifier
-            .width(140.dp)
-            .height(140.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = colorResource(R.color.background),
-            contentColor = colorResource(R.color.text_primary)
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+            .width(130.dp)
+            .padding(bottom = 8.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Column(
-            modifier = Modifier.padding(dimensionResource(R.dimen.padding_medium)),
-            verticalArrangement = Arrangement.Center
-        ) {
-            Text(
-                text = name,
-                style = MaterialTheme.typography.bodyLarge,
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis
+        Card(
+            modifier = Modifier
+                .size(130.dp),
+            elevation = CardDefaults.cardElevation(4.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = colorResource(R.color.background)
             )
+        ) {
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier.fillMaxSize()
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Person,
+                    contentDescription = null,
+                    tint = colorResource(R.color.primary_green),
+                    modifier = Modifier.size(48.dp)
+                )
+            }
         }
+        Text(
+            text = name,
+            style = MaterialTheme.typography.bodyMedium,
+            maxLines = 3,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier
+                .padding(top = 8.dp)
+                .fillMaxWidth()
+        )
     }
 }
 
 @Composable
 private fun BranchCard(address: String) {
-    Card(
+    Column(
         modifier = Modifier
-            .width(140.dp)
-            .height(140.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = colorResource(R.color.background),
-            contentColor = colorResource(R.color.text_primary)
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+            .width(130.dp)
+            .padding(bottom = 8.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Row(
+        Card(
             modifier = Modifier
-                .padding(dimensionResource(R.dimen.padding_medium))
-                .fillMaxSize(),
-            verticalAlignment = Alignment.CenterVertically
+                .size(130.dp),
+            elevation = CardDefaults.cardElevation(4.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = colorResource(R.color.background)
+            )
         ) {
-            Icon(
-                imageVector = Icons.Default.LocationOn,
-                contentDescription = null,
-                tint = colorResource(R.color.primary_green),
-                modifier = Modifier.size(dimensionResource(R.dimen.icon_size))
-            )
-            Spacer(modifier = Modifier.width(dimensionResource(R.dimen.padding_small)))
-            Text(
-                text = address,
-                style = MaterialTheme.typography.bodyLarge,
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis
-            )
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier.fillMaxSize()
+            ) {
+                Icon(
+                    imageVector = Icons.Default.LocationOn,
+                    contentDescription = null,
+                    tint = colorResource(R.color.primary_green),
+                    modifier = Modifier.size(48.dp)
+                )
+            }
         }
+        Text(
+            text = address,
+            style = MaterialTheme.typography.bodyMedium,
+            maxLines = 3,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier
+                .padding(top = 8.dp)
+                .fillMaxWidth()
+        )
     }
 }
