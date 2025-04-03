@@ -15,7 +15,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -74,10 +73,10 @@ private fun SpecialistsSection(navController: NavHostController) {
             horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_medium))
         ) {
             items(
-                items = fakeapi.specialists.take(3),
-                key = { it.id } // Добавляем ключ для стабильной идентификации
+                items = fakeapi.specialists.take(4),
+                key = { it.id }
             ) { specialist ->
-                SpecialistCard(name = specialist.name) // Передаем имя специалиста
+                SpecialistCard(name = specialist.name)
             }
         }
     }
@@ -95,7 +94,7 @@ private fun BranchesSection(navController: NavHostController) {
             contentPadding = PaddingValues(horizontal = dimensionResource(R.dimen.padding_medium)),
             horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_medium))
         ) {
-            items(fakeapi.branches.take(3)) { branch ->
+            items(fakeapi.branches.take(4)) { branch ->
                 BranchCard(address = branch)
             }
         }
