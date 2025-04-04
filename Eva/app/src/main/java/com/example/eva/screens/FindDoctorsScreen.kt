@@ -40,6 +40,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -71,10 +72,10 @@ fun FindDoctorsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Специалисты") },
+                title = { Text(stringResource(R.string.specialists)) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Назад")
+                        Icon(imageVector = Icons.Default.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 }
             )
@@ -98,14 +99,14 @@ fun FindDoctorsScreen(
                 onSearch = { active = false },
                 active = active,
                 onActiveChange = { active = it },
-                placeholder = { Text("Поиск") },
+                placeholder = { Text(stringResource(R.string.search)) },
                 trailingIcon = {
                     if (searchText.isNotEmpty()) {
                         IconButton(onClick = {
                             searchText = ""
                             keyboardController?.hide()
                         }) {
-                            Icon(Icons.Default.Close, contentDescription = "Очистить")
+                            Icon(Icons.Default.Close, contentDescription = stringResource(R.string.clear))
                         }
                     }
                 }
@@ -124,7 +125,7 @@ fun FindDoctorsScreen(
                 error != null -> {
                     ErrorPlaceholder(
                         errorMessage = if (error!!.contains("resolve host")) {
-                            "Нет подключения к интернету"
+                            stringResource(R.string.no_internet_connection)
                         } else {
                             error!!
                         },
@@ -174,7 +175,7 @@ fun ErrorPlaceholder(errorMessage: String, onRetry: () -> Unit) {
             onClick = onRetry,
             modifier = Modifier.padding(8.dp)
         ) {
-            Text("Обновить")
+            Text(stringResource(R.string.refresh))
         }
     }
 }
@@ -189,9 +190,11 @@ fun EmptyPlaceholder(searchQuery: String) {
     ) {
         Text(
             text = if (searchQuery.isBlank()) {
-                "Список специалистов пуст"
+                stringResource(R.string.no_data_about_specialists)
             } else {
-                "Специалисты по запросу \"$searchQuery\" не найдены"
+                stringResource(R.string.no_specialists_for_the_query) +
+                        ' ' + searchQuery +
+                        ' ' + stringResource(R.string.were_found)
             },
             textAlign = TextAlign.Center
         )
@@ -209,9 +212,6 @@ fun SpecialistCard2(name: String) {
         Card(
             modifier = Modifier.size(100.dp),
             elevation = CardDefaults.cardElevation(4.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = colorResource(R.color.background)
-            )
         ) {
             Box(
                 contentAlignment = Alignment.Center,

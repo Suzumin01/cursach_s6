@@ -1,4 +1,6 @@
-package com.example.eva
+package com.example.eva.ui.theme
+
+import com.example.eva.R
 
 object CustomIcons {
     val Home = R.drawable.ic_home_custom

@@ -6,8 +6,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import java.net.SocketTimeoutException
-import java.net.UnknownHostException
 
 class FindDoctorsViewModel : ViewModel() {
 
@@ -43,16 +41,5 @@ class FindDoctorsViewModel : ViewModel() {
 
     fun retry() {
         loadDoctors(lastSearchQuery)
-    }
-
-    private fun handleError(error: Throwable) {
-        _error.value = when {
-            isNoInternet(error) -> "Нет подключения к интернету"
-            else -> "Ошибка загрузки данных"
-        }
-    }
-
-    private fun isNoInternet(error: Throwable): Boolean {
-        return error is UnknownHostException || error is SocketTimeoutException
     }
 }

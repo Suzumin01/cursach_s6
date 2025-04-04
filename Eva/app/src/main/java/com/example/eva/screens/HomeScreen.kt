@@ -90,19 +90,19 @@ private fun SpecialistsSection(navController: NavHostController, viewModel: Find
                 ) {
                     Text(
                         text = if (error?.contains("resolve host") == true) {
-                            "Нет подключения к интернету"
+                            stringResource(R.string.no_internet_connection)
                         } else {
-                            error ?: "Неизвестная ошибка"
+                            error ?: stringResource(R.string.unknown_error)
                         },
                         color = MaterialTheme.colorScheme.error
                     )
                     Button(onClick = { viewModel.retry() }) {
-                        Text("Обновить")
+                        Text(stringResource(R.string.refresh))
                     }
                 }
             }
             doctors.isEmpty() -> {
-                Text("Нет данных о специалистах")
+                Text(stringResource(R.string.no_data_about_specialists))
             }
             else -> {
                 LazyRow(
@@ -156,8 +156,7 @@ private fun SectionWithHeader(
         ) {
             Text(
                 text = title,
-                style = MaterialTheme.typography.titleLarge,
-                color = colorResource(R.color.text_primary)
+                style = MaterialTheme.typography.titleLarge
             )
             Text(
                 text = actionText,
@@ -182,9 +181,6 @@ fun SpecialistCard(name: String) {
             modifier = Modifier
                 .size(130.dp),
             elevation = CardDefaults.cardElevation(4.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = colorResource(R.color.background)
-            )
         ) {
             Box(
                 contentAlignment = Alignment.Center,
@@ -222,9 +218,6 @@ private fun BranchCard(address: String) {
             modifier = Modifier
                 .size(130.dp),
             elevation = CardDefaults.cardElevation(4.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = colorResource(R.color.background)
-            )
         ) {
             Box(
                 contentAlignment = Alignment.Center,

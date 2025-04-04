@@ -4,4 +4,19 @@
     <string name="specialists">Специалисты</string>
     <string name="branches">Филиалы</string>
     <string name="more">Ещё</string>
+    <string name="back">Назад</string>
+    <string name="Data_loading_error">Ошибка загрузки данных</string>
+
+    <string name="search">Поиск</string>
+    <string name="clear">Очистить</string>
+    <string name="no_internet_connection">Нет подключения к интернету</string>
+    <string name="refresh">Обновить</string>
+    <string name="specialist_list_is_empty">Список специалистов пуст</string>
+
+    <string name="no_specialists_for_the_query">Специалисты по запросу</string>
+    <string name="were_found">не найдены</string>
+
+    <string name="unknown_error">Неизвестная ошибка</string>
+    <string name="no_data_about_specialists">Нет данных о специалистах</string>
+    <string name="dark_theme">Темная тема</string>
 </resources>

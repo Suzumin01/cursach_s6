@@ -10,6 +10,7 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -25,21 +26,25 @@ import com.example.eva.screens.HomeScreen
 import com.example.eva.screens.MessageScreen
 import com.example.eva.screens.ProfileScreen
 import com.example.eva.screens.SpecializationsListScreen
+import com.example.eva.ui.theme.CustomIcons
 import com.example.eva.ui.theme.EvaTheme
+import com.example.eva.ui.theme.ThemeViewModel
 
 class MainActivity : ComponentActivity() {
+    private val themeViewModel: ThemeViewModel by lazy { ThemeViewModel(applicationContext) }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            EvaTheme {
-                MainScreen()
+            val isDarkTheme by themeViewModel.isDarkTheme.collectAsState()
+            EvaTheme(darkTheme = isDarkTheme) {
+                MainScreen(themeViewModel)
             }
         }
     }
 }
 
 @Composable
-fun MainScreen() {
+fun MainScreen(themeViewModel: ThemeViewModel) {
     val navController = rememberNavController()
 
     Scaffold(
@@ -147,7 +152,7 @@ fun MainScreen() {
             composable(EvaScreens.Home.route) { HomeScreen(navController) }
             composable(EvaScreens.Message.route) { MessageScreen() }
             composable(EvaScreens.Calendar.route) { CalendarScreen() }
-            composable(EvaScreens.Profile.route) { ProfileScreen() }
+            composable(EvaScreens.Profile.route) { ProfileScreen(themeViewModel) }
             composable(EvaScreens.FindDoctors.route) { FindDoctorsScreen(navController) }
             composable(EvaScreens.SpecializationsList.route) { SpecializationsListScreen(navController) }
             composable(EvaScreens.BranchesList.route) { BranchesListScreen(navController) }
