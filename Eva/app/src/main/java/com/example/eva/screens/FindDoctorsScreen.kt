@@ -17,8 +17,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -28,6 +30,7 @@ import androidx.compose.material3.SearchBar
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -42,18 +45,26 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.eva.R
-import com.example.eva.fakeapi
+import com.example.eva.retrofit.FindDoctorsViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FindDoctorsScreen(navController: NavHostController) {
+fun FindDoctorsScreen(
+    navController: NavHostController,
+    viewModel: FindDoctorsViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
+) {
     var searchText by rememberSaveable { mutableStateOf("") }
     var active by rememberSaveable { mutableStateOf(false) }
     val keyboardController = LocalSoftwareKeyboardController.current
 
-    val filteredSpecialists = remember(searchText) {
-        fakeapi.specialists.filter {
-            it.name.contains(searchText, ignoreCase = true)
+    val doctors by viewModel.doctors.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
+    val error by viewModel.error.collectAsState()
+
+    val filteredDoctors = remember(searchText, doctors) {
+        if (searchText.isBlank()) doctors
+        else doctors.filter {
+            it.fullName.contains(searchText, ignoreCase = true)
         }
     }
 
@@ -63,10 +74,7 @@ fun FindDoctorsScreen(navController: NavHostController) {
                 title = { Text("Специалисты") },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(
-                            imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Назад"
-                        )
+                        Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Назад")
                     }
                 }
             )
@@ -84,6 +92,7 @@ fun FindDoctorsScreen(navController: NavHostController) {
                 query = searchText,
                 onQueryChange = {
                     searchText = it
+                    viewModel.loadDoctors(it)
                     if (it.isNotEmpty()) active = true
                 },
                 onSearch = { active = false },
@@ -92,44 +101,100 @@ fun FindDoctorsScreen(navController: NavHostController) {
                 placeholder = { Text("Поиск") },
                 trailingIcon = {
                     if (searchText.isNotEmpty()) {
-                        IconButton(
-                            onClick = {
-                                searchText = ""
-                                keyboardController?.hide()
-                            }
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Close,
-                                contentDescription = "Очистить",
-                                tint = MaterialTheme.colorScheme.onSurface
-                            )
+                        IconButton(onClick = {
+                            searchText = ""
+                            keyboardController?.hide()
+                        }) {
+                            Icon(Icons.Default.Close, contentDescription = "Очистить")
                         }
                     }
                 }
             ) {}
 
-            LazyColumn(
-                contentPadding = PaddingValues(16.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                items(filteredSpecialists) { specialist ->
-                    SpecialistCard2(name = specialist.name)
+            when {
+                isLoading -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator()
+                    }
                 }
 
-                item {
-                    if (filteredSpecialists.isEmpty() && searchText.isNotEmpty()) {
-                        Text(
-                            text = "Специалисты по запросу \"$searchText\" не найдены",
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(16.dp),
-                            textAlign = TextAlign.Center,
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                    }
+                error != null -> {
+                    ErrorPlaceholder(
+                        errorMessage = if (error!!.contains("resolve host")) {
+                            "Нет подключения к интернету"
+                        } else {
+                            error!!
+                        },
+                        onRetry = { viewModel.retry() }
+                    )
+                }
+
+                filteredDoctors.isEmpty() -> {
+                    EmptyPlaceholder(searchText)
+                }
+
+                else -> {
+                    DoctorsList(filteredDoctors)
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun DoctorsList(doctors: List<com.example.eva.retrofit.Doctor>) {
+    LazyColumn(
+        contentPadding = PaddingValues(16.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        items(doctors) { doctor ->
+            SpecialistCard2(name = doctor.fullName)
+        }
+    }
+}
+
+@Composable
+fun ErrorPlaceholder(errorMessage: String, onRetry: () -> Unit) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Text(
+            text = errorMessage,
+            color = MaterialTheme.colorScheme.error,
+            modifier = Modifier.padding(8.dp)
+        )
+        Button(
+            onClick = onRetry,
+            modifier = Modifier.padding(8.dp)
+        ) {
+            Text("Обновить")
+        }
+    }
+}
+
+@Composable
+fun EmptyPlaceholder(searchQuery: String) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = if (searchQuery.isBlank()) {
+                "Список специалистов пуст"
+            } else {
+                "Специалисты по запросу \"$searchQuery\" не найдены"
+            },
+            textAlign = TextAlign.Center
+        )
     }
 }
 

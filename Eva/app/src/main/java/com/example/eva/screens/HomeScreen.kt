@@ -10,6 +10,8 @@ import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
@@ -17,22 +19,25 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.eva.EvaScreens
 import com.example.eva.R
 import com.example.eva.fakeapi
+import com.example.eva.retrofit.FindDoctorsViewModel
 
 @Composable
 fun HomeScreen(
     navController: NavHostController,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    viewModel: FindDoctorsViewModel = viewModel()
 ) {
     LazyColumn(
         modifier = modifier.fillMaxSize(),
         contentPadding = PaddingValues(vertical = dimensionResource(R.dimen.padding_medium))
     ) {
         item { SpecializationSection(navController) }
-        item { SpecialistsSection(navController) }
+        item { SpecialistsSection(navController, viewModel) }
         item { BranchesSection(navController) }
     }
 }
@@ -61,22 +66,53 @@ private fun SpecializationSection(navController: NavHostController) {
 }
 
 @Composable
-private fun SpecialistsSection(navController: NavHostController) {
+private fun SpecialistsSection(navController: NavHostController, viewModel: FindDoctorsViewModel) {
+    val doctors by viewModel.doctors.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
+    val error by viewModel.error.collectAsState()
+
     SectionWithHeader(
         title = stringResource(R.string.specialists),
         actionText = stringResource(R.string.more),
         route = EvaScreens.FindDoctors.route,
         navController = navController
     ) {
-        LazyRow(
-            contentPadding = PaddingValues(horizontal = dimensionResource(R.dimen.padding_medium)),
-            horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_medium))
-        ) {
-            items(
-                items = fakeapi.specialists.take(4),
-                key = { it.id }
-            ) { specialist ->
-                SpecialistCard(name = specialist.name)
+        when {
+            isLoading -> {
+                Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator()
+                }
+            }
+            error != null -> {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = if (error?.contains("resolve host") == true) {
+                            "Нет подключения к интернету"
+                        } else {
+                            error ?: "Неизвестная ошибка"
+                        },
+                        color = MaterialTheme.colorScheme.error
+                    )
+                    Button(onClick = { viewModel.retry() }) {
+                        Text("Обновить")
+                    }
+                }
+            }
+            doctors.isEmpty() -> {
+                Text("Нет данных о специалистах")
+            }
+            else -> {
+                LazyRow(
+                    contentPadding = PaddingValues(horizontal = dimensionResource(R.dimen.padding_medium)),
+                    horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_medium))
+                ) {
+                    items(doctors.take(3)) { doctor ->
+                        SpecialistCard(name = doctor.fullName)
+                    }
+                }
             }
         }
     }
