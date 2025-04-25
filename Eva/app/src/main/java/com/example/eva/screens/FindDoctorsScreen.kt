@@ -1,5 +1,6 @@
 package com.example.eva.screens
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,7 +15,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
@@ -30,6 +31,7 @@ import androidx.compose.material3.SearchBar
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -38,25 +40,32 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.eva.R
 import com.example.eva.retrofit.FindDoctorsViewModel
+import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FindDoctorsScreen(
     navController: NavHostController,
-    viewModel: FindDoctorsViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
+    viewModel: FindDoctorsViewModel = viewModel(
+        factory = FindDoctorsViewModel.provideFactory(LocalContext.current)
+    )
 ) {
     var searchText by rememberSaveable { mutableStateOf("") }
     var active by rememberSaveable { mutableStateOf(false) }
+    var isSearchFinished by remember { mutableStateOf(false) }
     val keyboardController = LocalSoftwareKeyboardController.current
+    val history by viewModel.searchHistory.collectAsState()
 
     val doctors by viewModel.doctors.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
@@ -69,13 +78,27 @@ fun FindDoctorsScreen(
         }
     }
 
+    LaunchedEffect(searchText) {
+        if (searchText.isNotEmpty()) {
+            delay(2000)
+            viewModel.saveQueryToHistory(searchText)
+        }
+    }
+
+    LaunchedEffect(isSearchFinished) {
+        if (isSearchFinished) {
+            viewModel.addToHistory(searchText)
+            isSearchFinished = false
+        }
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text(stringResource(R.string.specialists)) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(imageVector = Icons.Default.ArrowBack, contentDescription = stringResource(R.string.back))
+                        Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 }
             )
@@ -91,12 +114,16 @@ fun FindDoctorsScreen(
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp, vertical = 8.dp),
                 query = searchText,
-                onQueryChange = {
-                    searchText = it
-                    viewModel.loadDoctors(it)
-                    if (it.isNotEmpty()) active = true
+                onQueryChange = { newText ->
+                    searchText = newText
+                    viewModel.loadDoctors(newText)
+                    //if (newText.isNotEmpty()) active = true
                 },
-                onSearch = { active = false },
+                onSearch = {
+                    keyboardController?.hide()
+                    viewModel.saveQueryToHistory(searchText)
+                    active = false
+                },
                 active = active,
                 onActiveChange = { active = it },
                 placeholder = { Text(stringResource(R.string.search)) },
@@ -104,23 +131,44 @@ fun FindDoctorsScreen(
                     if (searchText.isNotEmpty()) {
                         IconButton(onClick = {
                             searchText = ""
+                            viewModel.loadDoctors("")
                             keyboardController?.hide()
                         }) {
-                            Icon(Icons.Default.Close, contentDescription = stringResource(R.string.clear))
+                            Icon(Icons.Default.Close, contentDescription = "Очистить")
+                        }
+                    }
+                },
+                content = {
+                    LazyColumn {
+                        items(history) { query ->
+                            Text(
+                                text = query,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable {
+                                        searchText = query
+                                        viewModel.loadDoctors(query)
+                                    }
+                                    .padding(16.dp)
+                            )
+                        }
+
+                        item {
+                            if (history.isNotEmpty()) {
+                                Button(
+                                    onClick = { viewModel.clearHistory() },
+                                    modifier = Modifier.fillMaxWidth().padding(8.dp)
+                                ) {
+                                    Text("Очистить историю")
+                                }
+                            }
                         }
                     }
                 }
-            ) {}
+            )
 
             when {
-                isLoading -> {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        CircularProgressIndicator()
-                    }
-                }
+                isLoading -> LoadingIndicator()
 
                 error != null -> {
                     ErrorPlaceholder(
@@ -142,6 +190,16 @@ fun FindDoctorsScreen(
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun LoadingIndicator() {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        CircularProgressIndicator()
     }
 }
 

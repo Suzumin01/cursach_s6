@@ -14,6 +14,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
@@ -30,7 +31,9 @@ import com.example.eva.retrofit.FindDoctorsViewModel
 fun HomeScreen(
     navController: NavHostController,
     modifier: Modifier = Modifier,
-    viewModel: FindDoctorsViewModel = viewModel()
+    viewModel: FindDoctorsViewModel = viewModel(
+        factory = FindDoctorsViewModel.provideFactory(LocalContext.current)
+    )
 ) {
     LazyColumn(
         modifier = modifier.fillMaxSize(),
