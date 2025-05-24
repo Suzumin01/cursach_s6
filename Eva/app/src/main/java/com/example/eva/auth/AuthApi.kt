@@ -1,12 +1,13 @@
 package com.example.eva.auth
 
+import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.POST
 
 interface AuthApi {
     @POST("login")
-    fun login(@Body request: LoginRequest): Call<AuthResponce>
+    suspend fun login(@Body request: LoginRequest): Response<AuthResponse>
 
     @POST("register")
-    fun register(@Body request: RegisterRequest): Call<AuthResponce>
+    suspend fun register(@Body request: RegisterRequest): Response<AuthResponse>
 }

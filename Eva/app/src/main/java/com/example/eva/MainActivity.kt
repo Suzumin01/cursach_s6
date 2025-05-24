@@ -14,18 +14,23 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.eva.auth.AuthViewModel
 import com.example.eva.screens.BranchesListScreen
 import com.example.eva.screens.CalendarScreen
 import com.example.eva.screens.FindDoctorsScreen
 import com.example.eva.screens.HomeScreen
 import com.example.eva.screens.MessageScreen
+import com.example.eva.screens.ProfileListScreen
 import com.example.eva.screens.ProfileScreen
 import com.example.eva.screens.SpecializationsListScreen
+import com.example.eva.screens.auth_screen.LoginScreen
+import com.example.eva.screens.auth_screen.RegisterScreen
 import com.example.eva.ui.theme.CustomIcons
 import com.example.eva.ui.theme.EvaTheme
 import com.example.eva.ui.theme.ThemeViewModel
@@ -46,6 +51,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun MainScreen(themeViewModel: ThemeViewModel) {
     val navController = rememberNavController()
+    val authViewModel: AuthViewModel = viewModel()
 
     Scaffold(
         bottomBar = {
@@ -152,7 +158,10 @@ fun MainScreen(themeViewModel: ThemeViewModel) {
             composable(EvaScreens.Home.route) { HomeScreen(navController) }
             composable(EvaScreens.Message.route) { MessageScreen() }
             composable(EvaScreens.Calendar.route) { CalendarScreen() }
-            composable(EvaScreens.Profile.route) { ProfileScreen(themeViewModel) }
+            composable(EvaScreens.Profile.route) { ProfileScreen(themeViewModel, navController) }
+            composable(EvaScreens.ProfileList.route) { ProfileListScreen(navController) }
+            composable(EvaScreens.Login.route) { LoginScreen(authViewModel, navController) }
+            composable(EvaScreens.Register.route) { RegisterScreen(authViewModel, navController) }
             composable(EvaScreens.FindDoctors.route) { FindDoctorsScreen(navController) }
             composable(EvaScreens.SpecializationsList.route) { SpecializationsListScreen(navController) }
             composable(EvaScreens.BranchesList.route) { BranchesListScreen(navController) }

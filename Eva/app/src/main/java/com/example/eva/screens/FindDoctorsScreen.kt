@@ -98,7 +98,8 @@ fun FindDoctorsScreen(
                 title = { Text(stringResource(R.string.specialists)) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
+                        Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = stringResource(R.string.back))
                     }
                 }
             )

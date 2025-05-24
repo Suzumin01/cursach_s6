@@ -19,4 +19,5 @@
     <string name="unknown_error">Неизвестная ошибка</string>
     <string name="no_data_about_specialists">Нет данных о специалистах</string>
     <string name="dark_theme">Темная тема</string>
+    <string name="my_profiles">Мои профили</string>
 </resources>
