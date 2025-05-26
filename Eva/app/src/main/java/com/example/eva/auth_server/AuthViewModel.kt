@@ -1,4 +1,4 @@
-package com.example.eva.auth
+package com.example.eva.auth_server
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

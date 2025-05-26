@@ -1,4 +1,4 @@
-package com.example.eva.auth
+package com.example.eva.auth_server
 
 import com.google.gson.annotations.SerializedName
 

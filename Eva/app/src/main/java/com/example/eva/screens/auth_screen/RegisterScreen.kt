@@ -24,8 +24,8 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.eva.EvaScreens
-import com.example.eva.auth.AuthState
-import com.example.eva.auth.AuthViewModel
+import com.example.eva.auth_server.AuthState
+import com.example.eva.auth_server.AuthViewModel
 
 @SuppressLint("StateFlowValueCalledInComposition")
 @Composable

@@ -50,6 +50,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.eva.R
+import com.example.eva.retrofit.DoctorWithNames
 import com.example.eva.retrofit.FindDoctorsViewModel
 import kotlinx.coroutines.delay
 
@@ -67,16 +68,19 @@ fun FindDoctorsScreen(
     val keyboardController = LocalSoftwareKeyboardController.current
     val history by viewModel.searchHistory.collectAsState()
 
-    val doctors by viewModel.doctors.collectAsState()
+//    val doctors by viewModel.doctors.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val error by viewModel.error.collectAsState()
 
-    val filteredDoctors = remember(searchText, doctors) {
-        if (searchText.isBlank()) doctors
-        else doctors.filter {
-            it.fullName.contains(searchText, ignoreCase = true)
-        }
-    }
+//    val doctorsWithNames = doctors.map { viewModel.mapDoctorToUi(it) }
+    val doctorsWithNames by viewModel.doctorsUi.collectAsState()
+
+//    val filteredDoctors = remember(searchText, doctors) {
+//        if (searchText.isBlank()) doctors
+//        else doctors.filter {
+//            it.fullName.contains(searchText, ignoreCase = true)
+//        }
+//    }
 
     LaunchedEffect(searchText) {
         if (searchText.isNotEmpty()) {
@@ -182,12 +186,12 @@ fun FindDoctorsScreen(
                     )
                 }
 
-                filteredDoctors.isEmpty() -> {
+                doctorsWithNames.isEmpty() -> {
                     EmptyPlaceholder(searchText)
                 }
 
                 else -> {
-                    DoctorsList(filteredDoctors)
+                    DoctorsList(doctorsWithNames)
                 }
             }
         }
@@ -205,16 +209,20 @@ private fun LoadingIndicator() {
 }
 
 @Composable
-private fun DoctorsList(doctors: List<com.example.eva.retrofit.Doctor>) {
+private fun DoctorsList(doctors: List<DoctorWithNames>) {
     LazyColumn(
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         items(doctors) { doctor ->
-            SpecialistCard2(name = doctor.fullName)
+            SpecialistCard2(
+                name = doctor.fullName,
+                speciality = doctor.speciality
+            )
         }
     }
 }
+
 
 @Composable
 fun ErrorPlaceholder(errorMessage: String, onRetry: () -> Unit) {
@@ -261,7 +269,7 @@ fun EmptyPlaceholder(searchQuery: String) {
 }
 
 @Composable
-fun SpecialistCard2(name: String) {
+fun SpecialistCard2(name: String, speciality: String) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -287,12 +295,19 @@ fun SpecialistCard2(name: String) {
 
         Spacer(modifier = Modifier.width(16.dp))
 
-        Text(
-            text = name,
-            style = MaterialTheme.typography.titleMedium,
-            maxLines = 2,
-            overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.weight(1f)
-        )
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = name,
+                style = MaterialTheme.typography.titleMedium,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis
+            )
+            Text(
+                text = speciality,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.primary
+            )
+        }
     }
 }
+

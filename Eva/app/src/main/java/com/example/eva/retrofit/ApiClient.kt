@@ -4,7 +4,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 object ApiClient {
-    private const val BASE_URL = "https://67efa5f12a80b06b88952c97.mockapi.io/api/v1/"
+    private const val BASE_URL = "http://10.0.2.2:8081/"
 
     val apiService: TelemedicineApiService by lazy {
         Retrofit.Builder()

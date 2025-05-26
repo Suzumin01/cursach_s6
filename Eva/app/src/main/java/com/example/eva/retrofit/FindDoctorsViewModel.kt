@@ -19,14 +19,21 @@ class FindDoctorsViewModel(
     private val _doctors = MutableStateFlow<List<Doctor>>(emptyList())
     private val _isLoading = MutableStateFlow(true)
     private val _error = MutableStateFlow<String?>(null)
+    private val _specialities = MutableStateFlow<List<Speciality>>(emptyList())
+    private val _branches = MutableStateFlow<List<Branch>>(emptyList())
+    private val _doctorsUi = MutableStateFlow<List<DoctorWithNames>>(emptyList())
+    val doctorsUi: StateFlow<List<DoctorWithNames>> = _doctorsUi.asStateFlow()
 
     val doctors: StateFlow<List<Doctor>> = _doctors
     val isLoading: StateFlow<Boolean> = _isLoading
     val error: StateFlow<String?> = _error.asStateFlow()
+    val specialities = _specialities.asStateFlow()
+    val branches = _branches.asStateFlow()
 
     private var lastSearchQuery: String = ""
 
     init {
+        loadReferenceData()
         loadDoctors("")
         loadHistory()
     }
@@ -61,8 +68,23 @@ class FindDoctorsViewModel(
             try {
                 _isLoading.value = true
                 _error.value = null
-                val response = ApiClient.apiService.getDoctors(query)
+
+                val response = ApiClient.apiService.getDoctors()
+
+                val mappedDoctors = response.map { mapDoctorToUi(it) }
+
+                val filtered = if (query.isBlank()) {
+                    mappedDoctors
+                } else {
+                    mappedDoctors.filter {
+                        it.fullName.contains(query, ignoreCase = true) ||
+                                it.speciality.contains(query, ignoreCase = true) ||
+                                it.branch.contains(query, ignoreCase = true)
+                    }
+                }
+
                 _doctors.value = response
+                _doctorsUi.value = filtered
             } catch (e: Exception) {
                 _error.value = e.message ?: "Ошибка загрузки данных"
             } finally {
@@ -71,11 +93,31 @@ class FindDoctorsViewModel(
         }
     }
 
+
+    fun mapDoctorToUi(doctor: Doctor): DoctorWithNames {
+        val specialityName = specialities.value.find { it.id == doctor.specialityId }?.name ?: "Неизвестно"
+        val branchName = branches.value.find { it.id == doctor.branchId }?.name ?: "Неизвестно"
+        return DoctorWithNames(
+            fullName = doctor.fullName,
+            speciality = specialityName,
+            branch = branchName
+        )
+    }
+
     fun retry() {
         loadDoctors(lastSearchQuery)
     }
 
-
+    fun loadReferenceData() {
+        viewModelScope.launch {
+            try {
+                _specialities.value = ApiClient.apiService.getSpecialities()
+                _branches.value = ApiClient.apiService.getBranches()
+            } catch (e: Exception) {
+                // лог ошибки
+            }
+        }
+    }
 
     companion object {
         fun provideFactory(context: Context): ViewModelProvider.Factory {

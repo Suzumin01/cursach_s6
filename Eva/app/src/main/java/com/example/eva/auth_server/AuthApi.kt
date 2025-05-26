@@ -1,4 +1,4 @@
-package com.example.eva.auth
+package com.example.eva.auth_server
 
 import retrofit2.Response
 import retrofit2.http.Body

@@ -1,4 +1,4 @@
-package com.example.eva.auth
+package com.example.eva.auth_server
 
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit

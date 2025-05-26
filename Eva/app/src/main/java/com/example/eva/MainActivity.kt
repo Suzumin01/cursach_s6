@@ -20,7 +20,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.eva.auth.AuthViewModel
+import com.example.eva.auth_server.AuthViewModel
 import com.example.eva.screens.BranchesListScreen
 import com.example.eva.screens.CalendarScreen
 import com.example.eva.screens.FindDoctorsScreen
