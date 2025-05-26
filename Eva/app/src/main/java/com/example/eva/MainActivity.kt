@@ -20,6 +20,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.eva.auth_server.AuthViewModel
 import com.example.eva.screens.BranchesListScreen
 import com.example.eva.screens.CalendarScreen
@@ -162,7 +163,18 @@ fun MainScreen(themeViewModel: ThemeViewModel) {
             composable(EvaScreens.ProfileList.route) { ProfileListScreen(navController) }
             composable(EvaScreens.Login.route) { LoginScreen(authViewModel, navController) }
             composable(EvaScreens.Register.route) { RegisterScreen(authViewModel, navController) }
-            composable(EvaScreens.FindDoctors.route) { FindDoctorsScreen(navController) }
+            composable(
+                route = "find_doctors?specialization={specialization}",
+                arguments = listOf(
+                    navArgument("specialization") {
+                        nullable = true
+                        defaultValue = null
+                    }
+                )
+            ) { backStackEntry ->
+                val specialization = backStackEntry.arguments?.getString("specialization")
+                FindDoctorsScreen(navController = navController, initialSpecialization = specialization)
+            }
             composable(EvaScreens.SpecializationsList.route) { SpecializationsListScreen(navController) }
             composable(EvaScreens.BranchesList.route) { BranchesListScreen(navController) }
         }

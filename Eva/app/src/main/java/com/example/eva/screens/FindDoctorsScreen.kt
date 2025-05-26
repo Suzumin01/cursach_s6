@@ -58,29 +58,36 @@ import kotlinx.coroutines.delay
 @Composable
 fun FindDoctorsScreen(
     navController: NavHostController,
+    initialSpecialization: String? = null,
     viewModel: FindDoctorsViewModel = viewModel(
         factory = FindDoctorsViewModel.provideFactory(LocalContext.current)
     )
 ) {
-    var searchText by rememberSaveable { mutableStateOf("") }
+    val query = rememberSaveable { mutableStateOf(initialSpecialization.orEmpty()) }
+    var searchText by rememberSaveable { mutableStateOf(query.value) }
     var active by rememberSaveable { mutableStateOf(false) }
     var isSearchFinished by remember { mutableStateOf(false) }
     val keyboardController = LocalSoftwareKeyboardController.current
     val history by viewModel.searchHistory.collectAsState()
 
-//    val doctors by viewModel.doctors.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val error by viewModel.error.collectAsState()
 
-//    val doctorsWithNames = doctors.map { viewModel.mapDoctorToUi(it) }
     val doctorsWithNames by viewModel.doctorsUi.collectAsState()
 
-//    val filteredDoctors = remember(searchText, doctors) {
-//        if (searchText.isBlank()) doctors
-//        else doctors.filter {
-//            it.fullName.contains(searchText, ignoreCase = true)
-//        }
-//    }
+    var hasInitialSearchRun by remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        if (!hasInitialSearchRun && query.value.isNotBlank()) {
+            hasInitialSearchRun = true
+            searchText = query.value
+            active = true
+            delay(1000)
+            active = false
+            viewModel.loadDoctors(query.value)
+            viewModel.saveQueryToHistory(query.value)
+        }
+    }
 
     LaunchedEffect(searchText) {
         if (searchText.isNotEmpty()) {
@@ -127,6 +134,7 @@ fun FindDoctorsScreen(
                 onSearch = {
                     keyboardController?.hide()
                     viewModel.saveQueryToHistory(searchText)
+                    viewModel.loadDoctors(searchText)
                     active = false
                 },
                 active = active,
@@ -153,6 +161,7 @@ fun FindDoctorsScreen(
                                     .clickable {
                                         searchText = query
                                         viewModel.loadDoctors(query)
+                                        keyboardController?.hide()
                                     }
                                     .padding(16.dp)
                             )

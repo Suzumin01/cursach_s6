@@ -24,7 +24,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.eva.EvaScreens
 import com.example.eva.R
-import com.example.eva.fakeapi
 import com.example.eva.retrofit.FindDoctorsViewModel
 
 @Composable
@@ -39,14 +38,19 @@ fun HomeScreen(
         modifier = modifier.fillMaxSize(),
         contentPadding = PaddingValues(vertical = dimensionResource(R.dimen.padding_medium))
     ) {
-        item { SpecializationSection(navController) }
+        item { SpecializationSection(navController, viewModel) }
         item { SpecialistsSection(navController, viewModel) }
-        item { BranchesSection(navController) }
+        item { BranchesSection(navController, viewModel) }
     }
 }
 
 @Composable
-private fun SpecializationSection(navController: NavHostController) {
+private fun SpecializationSection(
+    navController: NavHostController,
+    viewModel: FindDoctorsViewModel
+) {
+    val specializations by viewModel.specialities.collectAsState()
+
     SectionWithHeader(
         title = stringResource(R.string.specializations),
         actionText = stringResource(R.string.more),
@@ -54,14 +58,19 @@ private fun SpecializationSection(navController: NavHostController) {
         navController = navController
     ) {
         Column {
-            fakeapi.specializations.take(3).forEach { specialization ->
+            specializations.take(3).forEach { specialization ->
                 ListItem(
                     headlineContent = {
                         Text(
-                            text = specialization,
+                            text = specialization.name,
                             modifier = Modifier.padding(horizontal = dimensionResource(R.dimen.padding_medium))
                         )
-                    }
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable {
+                            navController.navigate(EvaScreens.FindDoctors.withSpecialization(specialization.name))
+                        }
                 )
             }
         }
@@ -122,7 +131,9 @@ private fun SpecialistsSection(navController: NavHostController, viewModel: Find
 }
 
 @Composable
-private fun BranchesSection(navController: NavHostController) {
+private fun BranchesSection(navController: NavHostController, viewModel: FindDoctorsViewModel) {
+    val branches by viewModel.branches.collectAsState()
+
     SectionWithHeader(
         title = stringResource(R.string.branches),
         actionText = stringResource(R.string.more),
@@ -133,8 +144,8 @@ private fun BranchesSection(navController: NavHostController) {
             contentPadding = PaddingValues(horizontal = dimensionResource(R.dimen.padding_medium)),
             horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_medium))
         ) {
-            items(fakeapi.branches.take(4)) { branch ->
-                BranchCard(address = branch)
+            items(branches.take(4)) { branch ->
+                BranchCard(name = branch.name, address = branch.address)
             }
         }
     }
@@ -210,7 +221,7 @@ fun SpecialistCard(name: String) {
 }
 
 @Composable
-private fun BranchCard(address: String) {
+private fun BranchCard(name: String, address: String) {
     Column(
         modifier = Modifier
             .width(130.dp)
@@ -235,13 +246,20 @@ private fun BranchCard(address: String) {
             }
         }
         Text(
-            text = address,
+            text = name,
             style = MaterialTheme.typography.bodyMedium,
-            maxLines = 3,
+            maxLines = 1,
             overflow = TextOverflow.Ellipsis,
             modifier = Modifier
-                .padding(top = 8.dp)
+                .padding(top = 4.dp)
                 .fillMaxWidth()
+        )
+        Text(
+            text = address,
+            style = MaterialTheme.typography.bodySmall,
+            maxLines = 2,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.fillMaxWidth()
         )
     }
 }

@@ -33,9 +33,8 @@ class FindDoctorsViewModel(
     private var lastSearchQuery: String = ""
 
     init {
-        loadReferenceData()
-        loadDoctors("")
         loadHistory()
+        loadReferenceDataAndDoctors()
     }
 
     private fun loadHistory() {
@@ -71,20 +70,21 @@ class FindDoctorsViewModel(
 
                 val response = ApiClient.apiService.getDoctors()
 
-                val mappedDoctors = response.map { mapDoctorToUi(it) }
+                _doctors.value = response
 
-                val filtered = if (query.isBlank()) {
-                    mappedDoctors
+                val filteredDoctors = if (query.isBlank()) {
+                    response
                 } else {
-                    mappedDoctors.filter {
-                        it.fullName.contains(query, ignoreCase = true) ||
-                                it.speciality.contains(query, ignoreCase = true) ||
-                                it.branch.contains(query, ignoreCase = true)
+                    response.filter {
+                        it.fullName.contains(query, ignoreCase = true)
+                                || getSpecialityName(it.specialityId).contains(query, ignoreCase = true)
+                                || getBranchName(it.branchId).contains(query, ignoreCase = true)
                     }
                 }
 
-                _doctors.value = response
-                _doctorsUi.value = filtered
+                val mappedDoctors = filteredDoctors.map { mapDoctorToUi(it) }
+                _doctorsUi.value = mappedDoctors
+
             } catch (e: Exception) {
                 _error.value = e.message ?: "Ошибка загрузки данных"
             } finally {
@@ -93,6 +93,13 @@ class FindDoctorsViewModel(
         }
     }
 
+    private fun getSpecialityName(specialityId: Int): String {
+        return specialities.value.find { it.id == specialityId }?.name ?: ""
+    }
+
+    private fun getBranchName(branchId: Int): String {
+        return branches.value.find { it.id == branchId }?.name ?: ""
+    }
 
     fun mapDoctorToUi(doctor: Doctor): DoctorWithNames {
         val specialityName = specialities.value.find { it.id == doctor.specialityId }?.name ?: "Неизвестно"
@@ -108,13 +115,14 @@ class FindDoctorsViewModel(
         loadDoctors(lastSearchQuery)
     }
 
-    fun loadReferenceData() {
+    private fun loadReferenceDataAndDoctors() {
         viewModelScope.launch {
             try {
                 _specialities.value = ApiClient.apiService.getSpecialities()
                 _branches.value = ApiClient.apiService.getBranches()
+                loadDoctors("")
             } catch (e: Exception) {
-                // лог ошибки
+                _error.value = e.message ?: "Ошибка загрузки справочников"
             }
         }
     }

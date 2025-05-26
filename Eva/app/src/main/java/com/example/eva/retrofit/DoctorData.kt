@@ -19,7 +19,8 @@ data class Speciality(
 
 data class Branch(
     val id: Int,
-    val name: String
+    val name: String,
+    val address: String
 )
 
 data class DoctorWithNames(

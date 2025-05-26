@@ -1,6 +1,7 @@
 package com.example.eva.screens
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -24,19 +25,30 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.eva.R
-import com.example.eva.fakeapi
+import com.example.eva.retrofit.FindDoctorsViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BranchesListScreen(navController: NavHostController) {
+    val context = LocalContext.current
+    val viewModel: FindDoctorsViewModel = viewModel(
+        factory = FindDoctorsViewModel.provideFactory(context)
+    )
+
+    val branches by viewModel.branches.collectAsState()
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -58,9 +70,10 @@ fun BranchesListScreen(navController: NavHostController) {
                 .padding(innerPadding),
             contentPadding = PaddingValues(16.dp)
         ) {
-            items(fakeapi.branches) { branch ->
+            items(branches) { branch ->
                 BranchCard2(
-                    address = branch
+                    name = branch.name,
+                    address = branch.address
                 )
             }
         }
@@ -68,7 +81,7 @@ fun BranchesListScreen(navController: NavHostController) {
 }
 
 @Composable
-fun BranchCard2(address: String) {
+fun BranchCard2(name: String, address: String) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -94,12 +107,19 @@ fun BranchCard2(address: String) {
 
         Spacer(modifier = Modifier.width(16.dp))
 
-        Text(
-            text = address,
-            style = MaterialTheme.typography.titleMedium,
-            maxLines = 3,
-            overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.weight(1f)
-        )
+        Column {
+            Text(
+                text = name,
+                style = MaterialTheme.typography.titleMedium,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+            Text(
+                text = address,
+                style = MaterialTheme.typography.bodySmall,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
     }
 }
