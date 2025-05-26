@@ -117,12 +117,20 @@ private fun SpecialistsSection(navController: NavHostController, viewModel: Find
                 Text(stringResource(R.string.no_data_about_specialists))
             }
             else -> {
+                val doctorsWithNames = doctors.map { viewModel.mapDoctorToUi(it) }
+
                 LazyRow(
                     contentPadding = PaddingValues(horizontal = dimensionResource(R.dimen.padding_medium)),
                     horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_medium))
                 ) {
-                    items(doctors.take(3)) { doctor ->
-                        SpecialistCard(name = doctor.fullName)
+                    items(doctorsWithNames.take(3)) { doctor ->
+                        SpecialistCard(
+                            name = doctor.fullName,
+                            onClick = {
+                                navController.currentBackStackEntry?.savedStateHandle?.set("selectedDoctor", doctor)
+                                navController.navigate("doctorDetails")
+                            }
+                        )
                     }
                 }
             }
@@ -184,11 +192,12 @@ private fun SectionWithHeader(
 }
 
 @Composable
-fun SpecialistCard(name: String) {
+fun SpecialistCard(name: String, onClick: () -> Unit) {
     Column(
         modifier = Modifier
             .width(130.dp)
-            .padding(bottom = 8.dp),
+            .padding(bottom = 8.dp)
+            .clickable(onClick = onClick),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Card(
@@ -219,6 +228,7 @@ fun SpecialistCard(name: String) {
         )
     }
 }
+
 
 @Composable
 private fun BranchCard(name: String, address: String) {

@@ -16,14 +16,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.eva.auth_server.AuthViewModel
+import com.example.eva.retrofit.DoctorWithNames
 import com.example.eva.screens.BranchesListScreen
 import com.example.eva.screens.CalendarScreen
+import com.example.eva.screens.DoctorDetailsScreen
 import com.example.eva.screens.FindDoctorsScreen
 import com.example.eva.screens.HomeScreen
 import com.example.eva.screens.MessageScreen
@@ -177,6 +180,9 @@ fun MainScreen(themeViewModel: ThemeViewModel) {
             }
             composable(EvaScreens.SpecializationsList.route) { SpecializationsListScreen(navController) }
             composable(EvaScreens.BranchesList.route) { BranchesListScreen(navController) }
+            composable("doctorDetails") {
+                DoctorDetailsScreen(navController)
+            }
         }
     }
 }

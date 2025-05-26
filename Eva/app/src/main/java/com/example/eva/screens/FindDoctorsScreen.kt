@@ -49,6 +49,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
+import com.example.eva.EvaScreens
 import com.example.eva.R
 import com.example.eva.retrofit.DoctorWithNames
 import com.example.eva.retrofit.FindDoctorsViewModel
@@ -200,7 +202,7 @@ fun FindDoctorsScreen(
                 }
 
                 else -> {
-                    DoctorsList(doctorsWithNames)
+                    DoctorsList(doctorsWithNames, navController)
                 }
             }
         }
@@ -218,7 +220,7 @@ private fun LoadingIndicator() {
 }
 
 @Composable
-private fun DoctorsList(doctors: List<DoctorWithNames>) {
+private fun DoctorsList(doctors: List<DoctorWithNames>, navController: NavHostController) {
     LazyColumn(
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -226,11 +228,16 @@ private fun DoctorsList(doctors: List<DoctorWithNames>) {
         items(doctors) { doctor ->
             SpecialistCard2(
                 name = doctor.fullName,
-                speciality = doctor.speciality
+                speciality = doctor.speciality,
+                onClick = {
+                    navController.currentBackStackEntry?.savedStateHandle?.set("selectedDoctor", doctor)
+                    navController.navigate("doctorDetails")
+                }
             )
         }
     }
 }
+
 
 
 @Composable
@@ -278,10 +285,15 @@ fun EmptyPlaceholder(searchQuery: String) {
 }
 
 @Composable
-fun SpecialistCard2(name: String, speciality: String) {
+fun SpecialistCard2(
+    name: String,
+    speciality: String,
+    onClick: () -> Unit = {}
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .clickable { onClick() }
             .padding(vertical = 8.dp, horizontal = 16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -319,4 +331,5 @@ fun SpecialistCard2(name: String, speciality: String) {
         }
     }
 }
+
 

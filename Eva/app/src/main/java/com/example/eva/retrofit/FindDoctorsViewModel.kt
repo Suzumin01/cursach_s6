@@ -103,11 +103,15 @@ class FindDoctorsViewModel(
 
     fun mapDoctorToUi(doctor: Doctor): DoctorWithNames {
         val specialityName = specialities.value.find { it.id == doctor.specialityId }?.name ?: "Неизвестно"
-        val branchName = branches.value.find { it.id == doctor.branchId }?.name ?: "Неизвестно"
+        val branch = branches.value.find { it.id == doctor.branchId }
+        val branchName = branch?.name ?: "Неизвестно"
+        val branchAddress = branch?.address ?: "Адрес не указан"
         return DoctorWithNames(
+            id = doctor.id,
             fullName = doctor.fullName,
             speciality = specialityName,
-            branch = branchName
+            branch = branchName,
+            branchAddress = branchAddress
         )
     }
 
