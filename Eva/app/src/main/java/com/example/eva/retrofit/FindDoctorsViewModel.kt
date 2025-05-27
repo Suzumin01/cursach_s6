@@ -68,7 +68,7 @@ class FindDoctorsViewModel(
                 _isLoading.value = true
                 _error.value = null
 
-                val response = ApiClient.apiService.getDoctors()
+                val response = ApiClient.telemedicineApi.getDoctors()
 
                 _doctors.value = response
 
@@ -122,8 +122,8 @@ class FindDoctorsViewModel(
     private fun loadReferenceDataAndDoctors() {
         viewModelScope.launch {
             try {
-                _specialities.value = ApiClient.apiService.getSpecialities()
-                _branches.value = ApiClient.apiService.getBranches()
+                _specialities.value = ApiClient.telemedicineApi.getSpecialities()
+                _branches.value = ApiClient.telemedicineApi.getBranches()
                 loadDoctors("")
             } catch (e: Exception) {
                 _error.value = e.message ?: "Ошибка загрузки справочников"

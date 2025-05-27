@@ -24,6 +24,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.eva.auth_server.AuthViewModel
 import com.example.eva.retrofit.DoctorWithNames
+import com.example.eva.screens.AppointmentBookingScreen
 import com.example.eva.screens.BranchesListScreen
 import com.example.eva.screens.CalendarScreen
 import com.example.eva.screens.DoctorDetailsScreen
@@ -162,7 +163,9 @@ fun MainScreen(themeViewModel: ThemeViewModel) {
             composable(EvaScreens.Home.route) { HomeScreen(navController) }
             composable(EvaScreens.Message.route) { MessageScreen() }
             composable(EvaScreens.Calendar.route) { CalendarScreen() }
-            composable(EvaScreens.Profile.route) { ProfileScreen(themeViewModel, navController) }
+            composable(EvaScreens.Profile.route) {
+                ProfileScreen(themeViewModel, navController, authViewModel) // <-- передаём явно
+            }
             composable(EvaScreens.ProfileList.route) { ProfileListScreen(navController) }
             composable(EvaScreens.Login.route) { LoginScreen(authViewModel, navController) }
             composable(EvaScreens.Register.route) { RegisterScreen(authViewModel, navController) }
@@ -182,6 +185,17 @@ fun MainScreen(themeViewModel: ThemeViewModel) {
             composable(EvaScreens.BranchesList.route) { BranchesListScreen(navController) }
             composable("doctorDetails") {
                 DoctorDetailsScreen(navController)
+            }
+            composable(
+                route = EvaScreens.AppointmentBooking.route,
+                arguments = listOf(navArgument("doctorId") { type = NavType.IntType })
+            ) {
+                val doctorId = it.arguments?.getInt("doctorId") ?: return@composable
+                AppointmentBookingScreen(
+                    doctorId = doctorId,
+                    navController = navController,
+                    authViewModel = authViewModel // ← передаем!
+                )
             }
         }
     }

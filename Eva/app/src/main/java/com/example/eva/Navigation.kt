@@ -20,4 +20,7 @@ sealed class EvaScreens(val route: String) {
     object SpecializationsList : EvaScreens("specializations_list")
     object BranchesList : EvaScreens("branches_list")
     object DoctorDetails : EvaScreens("doctor_details")
+    object AppointmentBooking : EvaScreens("appointmentBooking/{doctorId}") {
+        fun withDoctorId(id: Int) = "appointmentBooking/$id"
+    }
 }

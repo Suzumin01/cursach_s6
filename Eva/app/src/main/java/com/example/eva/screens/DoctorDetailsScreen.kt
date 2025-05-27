@@ -35,6 +35,7 @@ import com.example.eva.retrofit.DoctorWithNames
 import androidx.compose.material.icons.filled.LocalHospital
 import androidx.compose.material.icons.filled.MedicalServices
 import androidx.compose.material.icons.filled.Place
+import com.example.eva.EvaScreens
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -61,7 +62,9 @@ fun DoctorDetailsScreen(navController: NavHostController) {
         },
         bottomBar = {
             Button(
-                onClick = { /* пока ничего */ },
+                onClick = {
+                    navController.navigate(EvaScreens.AppointmentBooking.withDoctorId(doctor.id))
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp)
