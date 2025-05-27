@@ -9,6 +9,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -25,6 +26,7 @@ import androidx.navigation.navArgument
 import com.example.eva.auth_server.AuthViewModel
 import com.example.eva.retrofit.DoctorWithNames
 import com.example.eva.screens.AppointmentBookingScreen
+import com.example.eva.screens.AppointmentDetailsScreen
 import com.example.eva.screens.BranchesListScreen
 import com.example.eva.screens.CalendarScreen
 import com.example.eva.screens.DoctorDetailsScreen
@@ -162,9 +164,9 @@ fun MainScreen(themeViewModel: ThemeViewModel) {
         ) {
             composable(EvaScreens.Home.route) { HomeScreen(navController) }
             composable(EvaScreens.Message.route) { MessageScreen() }
-            composable(EvaScreens.Calendar.route) { CalendarScreen() }
+            composable(EvaScreens.Calendar.route) { CalendarScreen(navController, authViewModel) }
             composable(EvaScreens.Profile.route) {
-                ProfileScreen(themeViewModel, navController, authViewModel) // <-- передаём явно
+                ProfileScreen(themeViewModel, navController, authViewModel)
             }
             composable(EvaScreens.ProfileList.route) { ProfileListScreen(navController) }
             composable(EvaScreens.Login.route) { LoginScreen(authViewModel, navController) }
@@ -194,9 +196,18 @@ fun MainScreen(themeViewModel: ThemeViewModel) {
                 AppointmentBookingScreen(
                     doctorId = doctorId,
                     navController = navController,
-                    authViewModel = authViewModel // ← передаем!
+                    authViewModel = authViewModel
                 )
             }
+            composable("appointment_details/{id}") { backStackEntry ->
+                val id = backStackEntry.arguments?.getString("id")?.toIntOrNull()
+                if (id != null) {
+                    AppointmentDetailsScreen(appointmentId = id, navController = navController)
+                } else {
+                    Text("Ошибка: некорректный ID")
+                }
+            }
+
         }
     }
 }

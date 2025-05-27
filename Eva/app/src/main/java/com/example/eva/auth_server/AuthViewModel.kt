@@ -44,7 +44,7 @@ class AuthViewModel : ViewModel() {
                 val request = RegisterRequest(login, password, email)
                 val response = ApiClient.authApi.register(request)
                 handleAuthResponse(response)
-                currentLogin = login // 💾 сохраняем логин при успешной регистрации
+                currentLogin = login
             } catch (e: Exception) {
                 _authState.value = AuthState.Error("Ошибка сети: ${e.message}")
             }
@@ -69,7 +69,6 @@ class AuthViewModel : ViewModel() {
     }
 }
 
-// Состояние авторизации
 sealed class AuthState {
     object Idle : AuthState()
     object Loading : AuthState()

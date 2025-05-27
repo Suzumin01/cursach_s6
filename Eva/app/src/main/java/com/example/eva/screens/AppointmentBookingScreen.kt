@@ -89,7 +89,6 @@ fun AppointmentBookingScreen(
 
             val isAuthorized = currentLogin != null
 
-            // Выбор даты
             Button(
                 onClick = {
                     val now = Calendar.getInstance()
@@ -109,7 +108,6 @@ fun AppointmentBookingScreen(
                 Text(text = if (selectedDateText.isBlank()) "Выбрать дату" else "Дата: $selectedDateText")
             }
 
-            // Выбор времени
             Button(
                 onClick = {
                     val now = Calendar.getInstance()
@@ -130,7 +128,6 @@ fun AppointmentBookingScreen(
                 Text(text = if (selectedTimeText.isBlank()) "Выбрать время" else "Время: $selectedTimeText")
             }
 
-            // Подтверждение
             Button(
                 onClick = {
                     if (isAuthorized && currentLogin!!.isNotBlank() &&
