@@ -23,8 +23,8 @@ class AuthViewModel : ViewModel() {
                 if (response.isSuccessful) {
                     val token = response.body()?.token
                     if (!token.isNullOrEmpty()) {
-                        _authState.value = AuthState.Success(token)
                         currentLogin = username
+                        _authState.value = AuthState.Success(token)
                     } else {
                         _authState.value = AuthState.Error("Пустой токен")
                     }

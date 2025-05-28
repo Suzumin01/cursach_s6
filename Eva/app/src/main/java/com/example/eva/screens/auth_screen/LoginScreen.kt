@@ -14,6 +14,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -34,23 +35,21 @@ fun LoginScreen(
     navController: NavController
 ) {
     val context = LocalContext.current
+    val authState by viewModel.authState.collectAsState()
+
     var login by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
-    LaunchedEffect(viewModel.authState.value) {
-        when (val state = viewModel.authState.value) {
-            is AuthState.Loading -> {
-                // ProgressBar
-            }
+    LaunchedEffect(authState) {
+        when (authState) {
             is AuthState.Success -> {
                 Toast.makeText(context, "Успешный вход!", Toast.LENGTH_SHORT).show()
-//                navController.navigate(EvaScreens.Profile.route) {
-//                    popUpTo(EvaScreens.Home.route) { inclusive = true }
-//                }
-                viewModel.resetState()
+                navController.navigate(EvaScreens.Profile.route) {
+                    popUpTo(EvaScreens.Home.route) { inclusive = true }
+                }
             }
             is AuthState.Error -> {
-                Toast.makeText(context, state.message, Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, (authState as AuthState.Error).message, Toast.LENGTH_SHORT).show()
             }
             else -> {}
         }
@@ -85,14 +84,25 @@ fun LoginScreen(
             onClick = {
                 if (login.isNotEmpty() && password.isNotEmpty()) {
                     viewModel.login(login, password)
-                    navController.navigate(EvaScreens.Profile.route) {
-                        popUpTo(EvaScreens.Home.route) { inclusive = true }
-                    }
+                } else {
+                    Toast.makeText(context, "Заполните все поля", Toast.LENGTH_SHORT).show()
                 }
             },
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("Войти")
         }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Button(
+            onClick = {
+                navController.navigate(EvaScreens.Register.route)
+            },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Регистрация")
+        }
     }
 }
+

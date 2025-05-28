@@ -3,6 +3,7 @@ package com.example.eva
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -44,21 +45,21 @@ import com.example.eva.ui.theme.ThemeViewModel
 
 class MainActivity : ComponentActivity() {
     private val themeViewModel: ThemeViewModel by lazy { ThemeViewModel(applicationContext) }
+    private val authViewModel: AuthViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             val isDarkTheme by themeViewModel.isDarkTheme.collectAsState()
             EvaTheme(darkTheme = isDarkTheme) {
-                MainScreen(themeViewModel)
+                MainScreen(themeViewModel, authViewModel)
             }
         }
     }
 }
 
 @Composable
-fun MainScreen(themeViewModel: ThemeViewModel) {
+fun MainScreen(themeViewModel: ThemeViewModel, authViewModel: AuthViewModel) {
     val navController = rememberNavController()
-    val authViewModel: AuthViewModel = viewModel()
 
     Scaffold(
         bottomBar = {
@@ -168,7 +169,7 @@ fun MainScreen(themeViewModel: ThemeViewModel) {
             composable(EvaScreens.Profile.route) {
                 ProfileScreen(themeViewModel, navController, authViewModel)
             }
-            composable(EvaScreens.ProfileList.route) { ProfileListScreen(navController) }
+            composable(EvaScreens.ProfileList.route) { ProfileListScreen(navController, authViewModel) }
             composable(EvaScreens.Login.route) { LoginScreen(authViewModel, navController) }
             composable(EvaScreens.Register.route) { RegisterScreen(authViewModel, navController) }
             composable(
