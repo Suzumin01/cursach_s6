@@ -25,14 +25,18 @@ fun ProfileScreen(
     Column(modifier = Modifier.padding(16.dp)) {
 
         if (authState is AuthState.Success && authViewModel.currentLogin != null) {
-            Text("Привет, ${authViewModel.currentLogin}!", Modifier.padding(bottom = 16.dp))
+            Text(
+                "Привет, ${authViewModel.currentLogin}!",
+                Modifier.padding(bottom = 16.dp),
+                style = MaterialTheme.typography.titleLarge
+            )
         }
 
         Button(
             onClick = { navController.navigate("profile_list") },
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Мои профили")
+            Text("Мой профиль")
         }
 
         Row(
